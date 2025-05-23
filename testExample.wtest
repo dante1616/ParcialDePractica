@@ -1,0 +1,89 @@
+import alianza.*
+import guerreros.*
+
+describe "Guerra Wollóctica" {
+  method entrenarAGuerrerosPorSeparados(){
+    alianza.entrenarIndividual(luke)
+    alianza.entrenarIndividual(yoda)
+    alianza.entrenarIndividual(arturito)
+    alianza.entrenarIndividual(c3po)
+  }
+
+  method reclutarAGuerreros(){
+    alianza.reclutar(luke)
+    alianza.reclutar(yoda)
+    alianza.reclutar(arturito)
+    alianza.reclutar(c3po)
+  }
+  test "Luke entrena sin cambiar de sable, la Alianza intenta reclutar a Luke pero no puede debido a su bajo poder y Luke aún no es un campeón." {
+    luke.entrenar()
+    alianza.reclutar(luke)
+    assert.that(alianza.guerreros().isEmpty())
+    assert.notThat(luke.esCampeon())
+  }
+  test "Luke cambia el sabe al Azul y entrena. La Alianza ahora sí puede reclutarlo y luke pasa a ser campeón."{
+    luke.cambiarSable(sableAzul)
+    luke.entrenar()
+
+    alianza.reclutar(luke)
+    assert.notThat(alianza.guerreros().isEmpty())
+    assert.that(luke.esCampeon())
+  }
+
+  test "Yoda alterna para usar la fuerza y entrenar. Su poder aumenta a 100. Pero aún no puede ser reclutado porque su energia esta en 30 unidades aunque es un campeón."{
+    yoda.alternarFuerza()
+    yoda.entrenar()
+    alianza.reclutar(yoda)
+    assert.that(alianza.guerreros().isEmpty())
+    assert.equals(100, yoda.poder())
+    assert.equals(30, yoda.salud())
+    }
+  test "Yoda entrena sin usar la fuerza. Ahora puede ser reclutado por la alianza porque su poder se mantiene en 50 pero su energía aumento a 55 unidades."{
+    yoda.entrenar()
+    alianza.reclutar(yoda)
+    assert.notThat(alianza.guerreros().isEmpty())
+    assert.equals(50, yoda.poder())
+    assert.equals(55, yoda.salud())
+  }
+  test "Arturito no puede ser reclutado por La Alianza."{
+    alianza.reclutar(arturito)
+    assert.that(alianza.guerreros().isEmpty())
+  }
+
+  test "Al entrenar la salud de Arturito cambia a 60 y su poder se reduce a 78. Ahora sí puede ser reclutado aunque en no es campeón."{
+    arturito.entrenar()
+    alianza.reclutar(arturito)
+    assert.equals(60, arturito.salud())
+    assert.equals(78, arturito.poder())
+    assert.notThat(alianza.guerreros().isEmpty())
+  }
+  test "C-3PO siempre puede ser reclutado por La Alianza, porque su poder de 30 y su salud de 80 unidades no varían."{
+    alianza.reclutar(c3po)
+    assert.notThat(alianza.guerreros().isEmpty())
+  }
+  test "C-3PO repara el Halcón Milenario, y su blindaje y velocidad mejoran a 700 y 1200, respectivamente, porque aún no es campeón."{
+    c3po.repararAlcon()
+    assert.equals(700, alconMilenario.velocidad())
+    assert.equals(1200, alconMilenario.blindaje())
+  }
+  test "C-3PO entrena y repara la nave; su blindaje y velocidad deberían ser 900 y 1400, pero ya es campeón."{
+    c3po.entrenar()
+    c3po.repararAlcon()
+    assert.equals(900, alconMilenario.velocidad())
+    assert.equals(1400, alconMilenario.blindaje())
+  }
+
+  test "El tamaño del ejército es de solo 3 guerreros."{
+    self.entrenarAGuerrerosPorSeparados()
+    self.reclutarAGuerreros()
+    assert.equals(3, alianza.guerreros().size())
+    assert.equals([yoda,arturito,c3po], alianza.guerreros())
+    assert.equals(233, alianza.poderTotalDelEjercito()) 
+    assert.notThat(alianza.sonPoderosos()) 
+    assert.that(alianza.ejercitoInvencible())
+    assert.equals([yoda], alianza.guerrrosDebiles(59))
+    assert.notThat(alianza.ganarBatalla(250))
+    assert.that(alianza.pocaSaludYMuchoPoder())
+    assert.equals(["Din Grogu","C-3PO"], alianza.listaDeCampeones())
+  }
+}
